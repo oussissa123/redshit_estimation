@@ -27,27 +27,24 @@ def dowload_as_fitbz2(url):
 
 def dowload_as_fit(url):
     return bz2.decompress(dowload_as_fitbz2(url))
-    
+
+def save(file, data, type_save='wb'):
+    saveFile = open(file,type_save)
+    saveFile.write(data)
+    saveFile.close()
 
 def fit_dowload(url, file):
-        saveFile = open(file,'wb')
-        saveFile.write(dowload_as_fit(url))
-        saveFile.close()
+    save(file, dowload_as_fit(url))
         
 def preprocessing(url):
     x = dowload_as_fit(url)
     return x
 def dowload_as_fitbz2_store_in_file(url, file):
-    saveFile = open(file,'wb')
-    saveFile.write(dowload_as_fitbz2(url))
-    saveFile.close()
+    save(file, dowload_as_fitbz2(url))
     
 def dowload_as_fit_store_in_file(url, file):
-    saveFile = open(file,'wb')
-    saveFile.write(dowload_as_fit(url))
-    saveFile.close()
+    save(file, dowload_as_fit(url))
     
-
 def comp_dowload(rerun, run, camcol, field, file):
     saveFile = open(file,'wb')
     saveFile.write(dowload_as_fitbz2(form_url(rerun, run, camcol, field)))
@@ -317,9 +314,24 @@ def plot_history_ac(history, ymax=None):
     pl.show()
     
     
-    
-    
-    
-    
+def split_csv_data(file, result_dir, size_for_each=50):
+    file_ = open(file, 'r');
+    titles = file_.readline();
+    data = titles
+    compte = 1
+    nbr_split = 1
+    for line in file_.readlines():
+        data = data + line
+        if (compte==size_for_each):
+            compte = 1
+            save(result_dir+'/'+str(nbr_split)+'.csv', data, type_save='w')
+            data = titles
+            nbr_split = nbr_split + 1
+        else:
+            compte = compte + 1
+    if data != titles:
+        save(result_dir+'/'+str(nbr_split)+'.csv', data, type_save='w')
+    file_.close();
+    print('------------- spliting ok -----------------')
     
     
