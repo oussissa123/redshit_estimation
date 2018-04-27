@@ -209,15 +209,16 @@ def load_data(file_csv, dir_img):
     Y = np.array(Y)
     return X, Y   
     
-def get_train_test_valid_data_galaxy(file_csv, dir_img, test_size = 0.21, valid_size = 0.4):
+def get_train_test_valid_data_galaxy(file_csv, dir_img, test_size = 0.21, valid_size = 0.4, size_all = None):
     #X, Y = load_data(file_csv, dir_img)
-    X, Y = get_all_in_folder(dir_img, file_csv)
+    X, Y = get_all_in_folder(dir_img, file_csv, size_all)
     X_Train, X_Test, Y_Train, Y_Test =  train_test_split(X,Y, test_size = test_size)
     del X
     del Y
     X_Test, X_Valid, Y_Test, Y_Valid = train_test_split(X_Test,Y_Test, test_size = valid_size)
     return X_Train, Y_Train, X_Test, Y_Test, X_Valid, Y_Valid
-    
+
+
 
 def plot_model(model):
     return SVG(keras.utils.vis_utils.model_to_dot(model, show_shapes=True).create(prog='dot', format='svg'))    
@@ -286,9 +287,17 @@ def split_csv_data(file, result_dir, size_for_each=50):
     file_.close();
     print('------------- spliting ok -----------------')
     
-def get_all_in_folder(images_folder, file_csv):
+def get_all_in_folder(images_folder, file_csv, size_all = None):
+    
+    toStop = size_all != None
+    try:
+        size_all = int(size_all)
+    except:
+        toStop = False
     
     files = g.glob(images_folder)
+    
+    total_size = len(files)
     
     redshifts = []
     data = []
@@ -299,7 +308,7 @@ def get_all_in_folder(images_folder, file_csv):
     nbr = 0
     lost_list = []
     del id_redshifts
-    
+    current_number = 0
     for name in files:
         try:
             fileName, fileExtension = os.path.splitext(os.path.basename(name))
@@ -311,6 +320,7 @@ def get_all_in_folder(images_folder, file_csv):
                 if not val.shape == (32,32,5):
                     raise Exception('','')
                 data.append(val)
+                current_number = current_number + 1
             except:
                 try:
                     del redshifts[-1]
@@ -318,6 +328,9 @@ def get_all_in_folder(images_folder, file_csv):
                     print('One problem')
                 nbr = nbr + 1
                 lost_list.append(fileName)
+                
+            if toStop and current_number == size_all :
+                break;
         except:
             nbr = nbr + 1
             lost_list.append(fileName)
@@ -366,4 +379,13 @@ def get_urls(file, fi):
     os.system('wget -i download_images/{}  -P ../data2/images/'.format(fi));
     print('end ....')
     
-    
+def fact(n):
+    try:
+        n = int(n);
+        if n<2:
+            return 1
+        else:
+            return n*fact(n-1)
+    except:
+        print('not integer')
+    print(fact(8))    
