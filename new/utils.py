@@ -218,6 +218,12 @@ def get_train_test_valid_data_galaxy(file_csv, dir_img, test_size = 0.21, valid_
     X_Test, X_Valid, Y_Test, Y_Valid = train_test_split(X_Test,Y_Test, test_size = valid_size)
     return X_Train, Y_Train, X_Test, Y_Test, X_Valid, Y_Valid
 
+def get_train_test(file_csv, dir_img, test_size = 0.5, size_all = None):
+    X, Y = get_all_in_folder(dir_img, file_csv, size_all)
+    X_Train, X_Test, Y_Train, Y_Test =  train_test_split(X,Y, test_size = test_size)
+    del X
+    del Y
+    return X_Train, Y_Train, X_Test, Y_Test   
 
 
 def plot_model(model):
