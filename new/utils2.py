@@ -2,13 +2,14 @@ from keras.layers import Add, Conv2D, BatchNormalization as batch, Input, Averag
 from keras.models import Model as M
 from keras.optimizers import Adam
 import utils as u
+from keras.optimizers import SGD as sgd
 
 def get_basic_residual_block(x, size):    
     y = Conv2D(size, (3,3), activation="relu", padding = "same")(x)
     y = batch()(y)
-    y = Conv2D(size, (3,3), activation="relu", padding = "same")(y)
+    y = Conv2D(size, (3,3), padding = "same")(y)
     y = batch()(y)
-    z = Conv2D(size, (1,1), activation="relu", padding = "same")(y)
+    z = Conv2D(size, (1,1), padding = "same")(y)
     y = Add()([y,z])
     return y
 def get_basic_residual_model(input_shape = Input(shape = (32,32,5)), layer_number = 32, k = 4, start_size = 32):
@@ -34,6 +35,8 @@ def get_basic_residual_model(input_shape = Input(shape = (32,32,5)), layer_numbe
     model = u.model_nn2(first, 64 , 5, dropout=0, batch_normalization=True, activation=None)
     
     model = M(inputs = input_shape, outputs = model)
+    
+    #sg = sgd(lr=0.01, momentum=0.9, decay=0.0001, nesterov=False)
     model.compile(loss=u.rmse_loss_keras, optimizer=Adam(), metrics=['accuracy'])
     
     return model
